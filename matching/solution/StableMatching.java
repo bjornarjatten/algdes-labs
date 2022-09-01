@@ -25,7 +25,7 @@ public class StableMatching {
 
     for (int i = 1; i <= pairs * 2; i++) {
       int[] idxs = Arrays
-        .stream(sc.nextLine().split(":")[1].split(" "))
+        .stream(sc.nextLine().split(":")[1].trim().split(" "))
         .mapToInt(Integer::parseInt).toArray();
 
       if (i % 2 == 0) {
