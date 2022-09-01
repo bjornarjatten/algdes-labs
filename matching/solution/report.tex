@@ -33,17 +33,14 @@
 
   \section{Implementation details}
 
-  The men's preferences are stored in a left-leaning red--black B-tree with $B=12$ and no inverse anti-snails,%
-  \sidenote{Replace with whatever data structure you actually use.}
-   as described in Section 5.2 of Kleinberg and Tardos, \emph{Algorithms Design}, Addison--Wesley 2013.%
-   \sidenote{If you refer to something, like a book or a stackexchange debate, or an external library, be professional about it.}
-  The women's preferences are stored in a heap.\sidenote{Replace with whatever data structure you actually use.}
+  The men's preferences are stored in a HashMap, where the key is the ID of the specific man and the value is an ArrayDeque composed of their preferences.
+  The women's preferences are stored in a HashMap where the key is the ID of the specific woman. 
+  The value is another HashMap where the key is the ID of the man and the value is the rank of given by the woman to the man.
 
-  We can check find a free man who has not proposed to every woman in time $[\ldots]$,
-  because we store $[\ldots]$.
+  We can find a free man who has not proposed to every woman in time $O(1)$,
+  because we store free men in an ArrayDeque.
 
-  With these data structures, our implementation runs in time $O(n\log n)$  \sidenote{Replace with your actual running time.}
-  on inputs with $n$ men and $n$ women.
+  With these data structures, our implementation runs in time $O(n^2)$ on inputs with $n$ men and $n$ women.
 
 
 \end{document}
