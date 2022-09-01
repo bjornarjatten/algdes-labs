@@ -10,6 +10,7 @@ public class StableMatching {
     String firstLine = line.trim().split("=")[1];
     int pairs = Integer.parseInt(firstLine);
 
+
     Map<Integer, Deque<Integer>> propPref = new HashMap<>();
     // rejId        propID,     rank
     Map<Integer, Map<Integer, Integer>> rejPref = new HashMap<>();
@@ -48,16 +49,17 @@ public class StableMatching {
     }
 
     Deque<Integer> propStack = new ArrayDeque<>();
-    for (int i = 0; i < names.length; i+=2) {
+    for (int i = 1; i < names.length; i+=2) {
       propStack.add(i);
     }
 
     Map<Integer, Integer> matches = new HashMap<>();
 
     while (!propStack.isEmpty()) {
-      int currentProposer = propStack.pop();
 
+      int currentProposer = propStack.pop();
       var prefRejecter = propPref.get(currentProposer).pollFirst();
+
       if (matches.containsKey(prefRejecter)) { 
         
         // check if better match for rejecter
@@ -70,13 +72,13 @@ public class StableMatching {
         int alternativeRank = rejRanks.get(currentProposer);
 
         // if not better match carry on
-        if (currentRank < alternativeRank) continue;
-
-
-        // if better match replace
-        matches.put(prefRejecter, currentProposer);
-        propStack.push(currentMatch);
-        
+        if (currentRank < alternativeRank) {
+          propStack.push(currentProposer);
+        } else {
+          // if better match replace
+          matches.put(prefRejecter, currentProposer);
+          propStack.push(currentMatch);
+        } 
 
       } else { // prefferedRejecter has no match yet
         matches.put(prefRejecter, currentProposer);
