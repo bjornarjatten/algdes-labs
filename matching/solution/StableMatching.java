@@ -49,7 +49,7 @@ public class StableMatching {
         Deque<Integer> prefs = new ArrayDeque<>();
         for (var idx : idxs) prefs.addLast(idx);
 
-        propPref.put(i, prefs);
+        propPref.put(rejId, prefs);
       }
     }
 
