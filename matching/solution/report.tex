@@ -16,20 +16,8 @@
 
   \section{Results}
 
-  Our implementation produces the expected results on all input--output file pairs, except {\tt sm-random-100.txt}, where it matches 54 with 12 instead of 2.
-  We have no idea why this happens.%
-  \sidenote{%
-  Complete the report by filling in your correct names,
-  filling in the parts marked $[\ldots]$,
-  and changing other parts wherever necessary.
-  For instance, if your implementation passes all tests, then write that.
-  Remove the sidenotes in your final hand-in.
-  }
-
-  On input {\tt sm-bbt-in.txt}, we produce the following matching:
-  \begin{quotation}
-    Sheldon--Amy, Rajesh--Penny, Howard--Bernadette, Leonard--Priya.  \sidenote{Replace with your results.}
-  \end{quotation}
+  Our implementation produces the expected results on all input--output file pairs, however we have a different ordering of the outputted matches.
+  This is due to the data structure we use to keep track of the proposers. We use a Stack for this purpose.
 
   \section{Implementation details}
 
