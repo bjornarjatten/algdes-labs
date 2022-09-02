@@ -25,11 +25,16 @@ public class StableMatching {
     sc.nextLine();
 
     for (int i = 1; i <= pairs * 2; i++) {
+
+      String[] thisLine = sc.nextLine().split(":");
+      
+      int rejId = Integer.parseInt(thisLine[0]);
+
       int[] idxs = Arrays
-        .stream(sc.nextLine().split(":")[1].trim().split(" "))
+        .stream(thisLine[1].trim().split(" "))
         .mapToInt(Integer::parseInt).toArray();
 
-      if (i % 2 == 0) {
+      if (rejId % 2 == 0) {
         // Rejecter == WOMEN        
         Map<Integer, Integer> rankByMan = new HashMap<>();
         for (int j = 0; j < idxs.length; j++) {
@@ -37,7 +42,7 @@ public class StableMatching {
           int rank = j;
           rankByMan.put(man, rank);
         }
-        rejPref.put(i, rankByMan);
+        rejPref.put(rejId, rankByMan);
 
       } else {
         // Proposer == MEN
