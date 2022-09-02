@@ -9,26 +9,46 @@
 
 
 \title{Stable Matching Report}
-\author{Bjarke Brodin (bjal), Bjørnar Haugstad Jåtten (bjja), Helle Friis (hefr) & Simon Boye Jørgensen (sboj)}
+\author{Bjarke Brodin (bjal), Bjørnar Haugstad Jåtten (bjja), Helle Friis (hefr) and Simon Boye Jørgensen (sboj)}
 
 \begin{document}
   \maketitle
 
   \section{Results}
 
-  Our implementation produces the expected results on all input--output file pairs, however we have a different ordering of the outputted matches.
-  This is due to the data structure we use to keep track of the proposers. We use a Stack for this purpose.
+  Our implementation produces the expected results 
+  on all input-output file pairs, 
+  however we have a different ordering of the outputted matches.
+  This could either be due to the data structure we use to keep 
+  track of the proposers,
+  or simply the ordering of the pairs when output. 
+  We use a stack for this purpose,
+  putting proposers back on the stack
+  whenever they are rejected or discarded 
+  (in favor of a better proposer).
 
   \section{Implementation details}
+  
+  The proposers preferences are stored in a HashMap, 
+  where the key is the ID of the specific proposer and 
+  the value is a queue composed of their preferences.
+  The rejecters preferences are stored in a HashMap where the key is the ID of the specific rejecter. 
+  The value is another HashMap where the key is the ID of the proposer and the value is the rank of given by the rejecter to the proposer.
 
-  The men's preferences are stored in a HashMap, where the key is the ID of the specific man and the value is an ArrayDeque composed of their preferences.
-  The women's preferences are stored in a HashMap where the key is the ID of the specific woman. 
-  The value is another HashMap where the key is the ID of the man and the value is the rank of given by the woman to the man.
+  \vspace{1em}
 
-  We can find a free man who has not proposed to every woman in time $O(1)$,
-  because we store free men in an ArrayDeque.
+  We can find a free proposer who has not proposed to every rejecter in time $O(1)$,
+  because we store free proposers on a Stack with $O(1)$ pop operations.
 
-  With these data structures, our implementation runs in time $O(n^2)$ on inputs with $n$ men and $n$ women.
+  \vspace{1em}
+
+  With these data structures, 
+  our implementation runs in worst-case time $O(n^2)$ on inputs with $n$ proposers and $n$ rejecters,
+  we can safely set this bound because all operations are $O(1)$,
+  expect reading the input which is $O(n)$,
+  and considering each possible of the $O(n^2)$ pairs at most once.
+
+
 
 
 \end{document}
