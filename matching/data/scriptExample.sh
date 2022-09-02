@@ -11,7 +11,7 @@ do
 
       python3 matchCompare.py $base.yourname.out.txt $base-out.txt > /dev/null
       if [[ ?$ ]]; then
-        echo "different order of pairs, however matching is identical"
+        echo "matching is identical"
       else
         continue
       fi 
