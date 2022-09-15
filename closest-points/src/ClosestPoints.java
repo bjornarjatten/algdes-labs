@@ -69,8 +69,8 @@ public class ClosestPoints {
     double delta_rx = points[split].x + delta;
 
     // Find insertion point
-    int delta_li = ~Arrays.binarySearch(points, new Node(delta_lx, 0), Node::compareByX);
-    int delta_ri = ~Arrays.binarySearch(points, new Node(delta_rx, 0), Node::compareByX);
+    int delta_li = Math.abs(~Arrays.binarySearch(points, new Node(delta_lx, 0), Node::compareByX));
+    int delta_ri = Math.abs(~Arrays.binarySearch(points, new Node(delta_rx, 0), Node::compareByX));
 
     Node[] s = Arrays.copyOfRange(points, delta_li, delta_ri);
     Arrays.sort(s, Node::compareByY);
@@ -99,17 +99,15 @@ public class ClosestPoints {
     }
 
     public static int compareByX(Node a, Node b) {
-      // if (b.x - a.x > 0) return -1;
-      // else if (b.x - a.x == 0) return 0;
-      // return 1;
-      return b.x - a.x > 0 ? -1 : 1;
+      if (b.x - a.x > 0) return -1;
+      else if (b.x - a.x == 0) return 0;
+      return 1;
     }
     
     public static int compareByY(Node a, Node b) {
-      // if (b.y - a.y > 0) return -1;
-      // else if (b.y - a.y == 0) return 0;
-      // return 1;
-      return b.y - a.y > 0 ? -1 : 1;
+      if (b.y - a.y > 0) return -1;
+      else if (b.y - a.y == 0) return 0;
+      return 1;
     }
 
     public String toString() {
