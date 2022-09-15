@@ -1,4 +1,5 @@
 import java.util.*;
+import java.awt.geom.Point2D;
 
 public class ClosestPoints {
   public static void main(String[] args) {
@@ -19,8 +20,6 @@ public class ClosestPoints {
         dimension = Integer.parseInt(input.split(":")[1].trim());
       }
     }
-
-    System.out.println(dimension);
 
     Node[] nodes = new Node[dimension];
 
@@ -59,8 +58,6 @@ public class ClosestPoints {
     // Java truncating integer division, equivalent to floor division
     int split = points.length / 2;
 
-
-    printArr(points);
     Node[] left = Arrays.copyOf(points, split + 1);
     Node[] right = Arrays.copyOfRange(points, split + 1, points.length);
     
@@ -76,7 +73,6 @@ public class ClosestPoints {
     int delta_ri = ~Arrays.binarySearch(points, new Node(delta_rx, 0), Node::compareByX);
 
     Node[] s = Arrays.copyOfRange(points, delta_li, delta_ri);
-    // printArr(s);
     Arrays.sort(s, Node::compareByY);
 
     double min_s = Double.POSITIVE_INFINITY;
@@ -99,18 +95,20 @@ public class ClosestPoints {
     }
 
     public static double dist(Node a, Node b) {
-      double dist = Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2);
-      return dist; 
+      return Point2D.distance(a.x, a.y, b.x, b.y);
     }
 
     public static int compareByX(Node a, Node b) {
+      // if (b.x - a.x > 0) return -1;
+      // else if (b.x - a.x == 0) return 0;
+      // return 1;
       return b.x - a.x > 0 ? -1 : 1;
     }
     
     public static int compareByY(Node a, Node b) {
-      // System.out.print(a);
-      // System.out.println(" " + b);
-      // System.out.println();
+      // if (b.y - a.y > 0) return -1;
+      // else if (b.y - a.y == 0) return 0;
+      // return 1;
       return b.y - a.y > 0 ? -1 : 1;
     }
 

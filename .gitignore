@@ -25,3 +25,4 @@
 *.fdb_latexmk
 *.fls
 matching/solution/report.synctex(busy)
+*.class
