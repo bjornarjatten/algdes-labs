@@ -45,7 +45,7 @@
   In order to merge we need to consider the 
   pairs thant have a point in each partition,
   which we can do by examining just the sublist 
-  $(x_i, y_i) \in P$ where $m_x + \delta \le x_i \le m_x + \delta$
+  $(x_i, y_i) \in P$ where $m_x - \delta \le x_i \le m_x + \delta$
   with $\delta = min(min_{left}, min_{right})$.
   Since this list has points $O(n)$,
   we sort it by $y$ coordinates,
@@ -99,6 +99,6 @@
 
   \section{References}
 
-  \kleinbergtardos John Kleinberg and Éva Tardos, Algorithm Design, 1st ed. ,Boston: Addison Wesley, 2006.
+  \kleinbergtardos \hspace{1em} John Kleinberg and Eva Tardos, Algorithm Design, 1st ed. ,Boston: Addison Wesley, 2006.
  
 \end{document}
