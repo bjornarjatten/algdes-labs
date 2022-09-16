@@ -1,12 +1,16 @@
 import java.util.*;
 import java.awt.geom.Point2D;
+import java.text.DecimalFormat;
 
 public class ClosestPoints {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
     Node[] nodes = loadTSPInput(sc);
     double closestPair = closestPair(nodes);
-    System.out.println(closestPair);
+
+    DecimalFormat df = new DecimalFormat("###.##############"); 
+    String formatted = df.format(closestPair); 
+    System.out.println(formatted);
   }
 
   private static Node[] loadTSPInput(Scanner sc) {
@@ -20,6 +24,8 @@ public class ClosestPoints {
         dimension = Integer.parseInt(input.split(":")[1].trim());
       }
     }
+
+    System.out.print(dimension + " ");
 
     Node[] nodes = new Node[dimension];
 
@@ -77,7 +83,7 @@ public class ClosestPoints {
 
     double min_s = Double.POSITIVE_INFINITY;
     for (int i = 0; i < s.length; i++) {
-      for (int j = i+1; j < Math.min(i+12, s.length); j++) {
+      for (int j = i+1; j < Math.min(i+15, s.length); j++) {
         min_s = Math.min(min_s, Node.dist(s[i], s[j]));
       }
     }

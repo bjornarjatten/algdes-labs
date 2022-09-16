@@ -6,54 +6,99 @@
 \usepackage{microtype}
 
 \pagestyle{empty}
-
+\newcommand{\kleinbergtardospp}[1]{[1, #1]}
+\newcommand{\kleinbergtardos}{[1]}
 
 \title{Closest Pair Report}
-\author{Alice Cooper and Bob Marley}
+\author{Bjarke Brodin (bjal), Bjørnar Haugstad Jåtten (bjja), Helle Friis (hefr) and Simon Boye Jørgensen (sboj)}
 
 \begin{document}
   \maketitle
 
+
+  \section{Problem}
+
+  Given a list of points $(x_i,y_i)$ in two-dimensional euclidean space,
+  find a pair with the minimal distance between the two points of any pair.
+
+
+
+  \section{Algorithm}
+  
+  We solve the problem using the divide-and-conquer algorithm exactly as described by Kleinberg and Tardos in \kleinbergtardospp{ch. 5.4},
+  a short outline of the algorthm as they describe it is given below.
+
+  We first sort all the points by their $x$ coordinate once, 
+  then we apply a mergesort-like recursion,
+  described as follows.
+
+  Given a list of points $P$,
+  if $|P| < 4$ then find the minimal distance by brute force,
+  this is the bottom of our recursion.
+  if $|P| \ge 4$ however,
+  then we partition the list in halves using the median $x$ coordinate, $m_x$
+  and recursively obtain the minimum (pair) distance of each sublist 
+  $min_{left}, min_{right}$.
+  Having obtained the local solutions for each list,
+  we then apply a merge step.
+  
+  In order to merge we need to consider the 
+  pairs thant have a point in each partition,
+  which we can do by examining just the sublist 
+  $(x_i, y_i) \in P$ where $m_x + \delta \le x_i \le m_x + \delta$
+  with $\delta = min(min_{left}, min_{right})$.
+  Since this list has points $O(n)$,
+  we sort it by $y$ coordinates,
+  and then consider only points in proximity in this order.
+  As shown in \kleinbergtardospp{ch. 5.4} (statement 5.10),
+  we need only consider pairs of points within 15 positions of
+  eachother within this list.
+
+
+
+  \section{Analysis}
+
+  We give a brief asymptotic analysis of our implemented algorithm.
+
+
+  Initially we apply a sort,
+  this is done using java standard library \verb+Arrays.sort+,
+  which is just Timsort,
+  and thus has a worst case bound of $O(n \log n)$.
+
+
+  Then for each merge step in the recursion,
+  we again apply a sort of $O(n \log n)$,
+  then a linear scan to compute the distance, 
+  this is $O(n)$.
+
+
+  In order to compute the split,
+  we perform two binary searches of $O(\log n)$.
+  Additionally,
+  we copy the sublists needed for the recursion $O(n)$
+  at each step (this can be optimized away, but we had no need).
+
+
+  This leaves us with  
+  $O(n \log n + \log n (n \log n + n + \log n) ) = O(n \log n \log n) = O(n \log^2 n)$ 
+  since it can easily be shown that mergesort-like recursion
+  does $\log n$ recursive steps, each amounting to $n$ work 
+  ($n \log n$ in our case, since we apply a sort of $O(n)$ elements to obtain the $y$ ordering).
+
+
+
   \section{Results}
 
-  Our implementation produces the expected results on all input--output file pairs, except {\tt slotermeier-23-tsp.txt}, where our code reports distance 2.531 as the shortest distance.
-  This may be because of rounding errors, or differences between {\tt float} and {\tt double} on various machines.
-  \sidenote{%
-  Complete the report by filling in your correct names,
-  filling in the parts marked $[\ldots]$,
-  and changing other parts wherever necessary.
-  For instance, if your implementation passes all tests, then write that.
-  Remove the sidenotes in your final hand-in.
-  }
-
-  The following table shows the closest pairs in the input files {\tt wc-instance-*.txt}.
-  Here $n$ denotes the number of points in the input,
-  and $(u,v)$ denotes a closest pair of points at distance $\delta$.
-
-  \bigskip\noindent
-  \begin{tabular}{rrrr}\toprule
-    $n$ & $u$ & $v$ & $\delta$ \\\midrule
-    2 & 0 & 1 & 1 \\
-    $[\ldots]$ \\\bottomrule
-  \end{tabular}
+  We have created a script, run-tsp-files.sh, that generates a 
+  diffOutput.txt file that shows the difference between our output 
+  (which can be found in the file output.txt), and the given output file from the assignment.
+  As we can see in the diffOutput.txt file, there are some differences,
+  however, these are only related to decimal rounding errors.
 
 
-  \section{Implementation details}
+  \section{References}
 
-  We resort by $y$-coordinates in each recursive step.
-
-  For the comparison of points close to $s$ in $S_y$ we inspect 15 points,
-  as explained (5.10) of Kleinberg and Tardos, \emph{Algorithm Design}, Addison--Wesley 2008.
-  Here is the corresponding part of our code:
-  \begin{verbatim}
-    min = [...]
-    for (s [...]
-      for [...]
-        if (s.distance(...) < min) [...]
-  \end{verbatim}
-
-  Our running time is $O(n\log n)$ for $n$ points.
-  \sidenote{Change or delete as necessary, add anything else you find interesting about your implemenation.}
-
-
+  \kleinbergtardos John Kleinberg and Éva Tardos, Algorithm Design, 1st ed. ,Boston: Addison Wesley, 2006.
+ 
 \end{document}
