@@ -43,9 +43,9 @@ public class Gorilla {
         if (a1.equals(a2)) continue;
         var genA = animalGenes.get(a1).trim();
         var genB = animalGenes.get(a2).trim();
-        // int score = optimal(genA, genA.length()-1, genB, genB.length()-1);
-        int score = new AlignmentSolver(table, genA, genB).getSolution();
-        System.out.println(a1 + "--" + a2 + ": \n" + genA + "\n" + genB + "\n" + score);
+        AlignmentSolver solver = new AlignmentSolver(table, genA, genB);
+        System.out.println(a1 + "--" + a2 + ": " + solver.getScore());
+        System.out.println(solver.getAlignment());
       }
     }
 
@@ -60,9 +60,9 @@ public class Gorilla {
       String animal = sc.nextLine().split(" ")[0].replace('>', Character.MIN_VALUE);
 
       String gen = String.join("", 
-        sc.nextLine(),
-        sc.nextLine(),
-        sc.nextLine()
+        sc.nextLine()//,
+        //sc.nextLine(),
+        //sc.nextLine()
       );
 
       animalGenes.put(animal, gen);
@@ -110,10 +110,14 @@ class AlignmentSolver {
   private Map<Pair<String, String>, Integer> table;
   private Map<Pair<Integer, Integer>, Integer> cache = new HashMap<>();
   private int solution;
+  private StringBuilder genAString;
+  private StringBuilder genBString;
 
   public AlignmentSolver(Map<Pair<String, String>, Integer> table, String genA, String genB) {
     this.table = table;
-    solution = solve(genA, genA.length()-1, genB, genB.length()-1);
+    this.genAString = new StringBuilder();
+    this.genBString = new StringBuilder();
+    this.solution = solve(genA, genA.length()-1, genB, genB.length()-1);
   }
 
   private int solve(String genA, int i, String genB, int j) {
@@ -121,16 +125,36 @@ class AlignmentSolver {
     if (!cache.containsKey(new Pair<>(i,j))){
 
       if (i == 0 && j == 0) {
-        cache.put(new Pair<>(i,j),
+        cache.put(
+          new Pair<>(i,j),
           table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))));
+          genAString.append(genA.charAt(i));
+          genBString.append(genA.charAt(j));
       } else if (i == 0) {
         int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
         int rest = delta * j;
-        cache.put(new Pair<>(i,j), cur + rest);
 
+        genAString.append(genA.charAt(i));
+        genBString.append(genB.charAt(j));
+
+        while (--j >= 0) {
+          genAString.append('-');
+          genBString.append(genB.charAt(j));
+        }
+
+        cache.put(new Pair<>(i, j), cur + rest);
       } else if (j == 0) {
         int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
         int rest = delta * i;
+
+        genAString.append(genA.charAt(i));
+        genBString.append(genB.charAt(j));
+        
+        while (--i >= 0) {
+          genAString.append(genA.charAt(i));
+          genBString.append('-');
+        }
+
         cache.put(new Pair<>(i,j), cur + rest);
       } else {
         int matching = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))) 
@@ -139,6 +163,30 @@ class AlignmentSolver {
         int dropA = delta + solve(genA, i-1, genB, j);
         int dropB = delta + solve(genA, i, genB, j-1);
 
+        if (matching >= dropA && matching >= dropB) { // length was i+1,j+1 - must have appended max(i,j) chars to sA sB
+          int appendedPerBranch = Math.max(i,j);
+          genAString.delete(appendedPerBranch, genAString.length());
+          genBString.delete(appendedPerBranch, genBString.length());
+          genAString.append(""+genA.charAt(i));
+          genBString.append(""+genB.charAt(j));
+        } else if (dropA >= matching && dropA >= dropB) {
+          int appendedPerBranch = Math.max(i-1,j);
+          genAString.delete(0, appendedPerBranch);
+          genAString.delete(appendedPerBranch*2, genAString.length());
+          genAString.append(genA.charAt(i));
+
+          genBString.delete(appendedPerBranch*2, genBString.length());
+          genBString.delete(0, appendedPerBranch);
+          genBString.append('-');
+        } else {
+          int appendedPerBranch = Math.max(i,j-1);
+          genAString.delete(0, appendedPerBranch*2);
+          genBString.delete(0, appendedPerBranch*2);
+          genAString.append('-');
+          genBString.append(genB.charAt(j));         
+        }
+
+
         cache.put(new Pair<>(i,j), Math.max(matching, Math.max(dropA, dropB)));
       }
     }
@@ -146,7 +194,12 @@ class AlignmentSolver {
     return cache.get(new Pair<>(i,j));
   }
 
-  public int getSolution() {
+  public int getScore() {
     return this.solution;
   } 
+
+  public String getAlignment() {
+    return this.genAString.toString() + "\n" + this.genBString.toString();
+  }
+
 }
