@@ -18,7 +18,7 @@ class Pair<A,B> {
   }
 
   @Override public int hashCode() {
-    return ( fst.hashCode() << 31 + 5 ) + snd.hashCode();
+    return ( ( 17 + fst.hashCode() ) << 31 + 5 ) + snd.hashCode();
   }
 
   @Override public boolean equals(Object other) {
@@ -33,7 +33,6 @@ class Pair<A,B> {
 public class Gorilla {
   static Map<Pair<String, String>, Integer> table;
   static Map<String, String> animalGenes;
-  static Map<Pair<Integer, Integer>, Integer> cache = new HashMap<>();
 
   public static void main(String[] args) throws FileNotFoundException {
     table = getBlosum();
@@ -42,10 +41,11 @@ public class Gorilla {
     for(var a1 : animalGenes.keySet()) {
       for(var a2 : animalGenes.keySet()) {
         if (a1.equals(a2)) continue;
-        var genA = animalGenes.get(a1);
-        var genB = animalGenes.get(a2);
-        int score = optimal(genA, genA.length()-1, genB, genB.length()-1);
-        System.out.println(a1 + "--" + a2 + ": " + score);
+        var genA = animalGenes.get(a1).trim();
+        var genB = animalGenes.get(a2).trim();
+        // int score = optimal(genA, genA.length()-1, genB, genB.length()-1);
+        int score = new AlignmentSolver(table, genA, genB).getSolution();
+        System.out.println(a1 + "--" + a2 + ": \n" + genA + "\n" + genB + "\n" + score);
       }
     }
 
@@ -60,9 +60,9 @@ public class Gorilla {
       String animal = sc.nextLine().split(" ")[0].replace('>', Character.MIN_VALUE);
 
       String gen = String.join("", 
+        sc.nextLine(),
+        sc.nextLine(),
         sc.nextLine()
-        // sc.nextLine(),
-        // sc.nextLine()
       );
 
       animalGenes.put(animal, gen);
@@ -82,40 +82,71 @@ public class Gorilla {
     Map<Pair<String, String>, Integer> table = new HashMap<>();
     String[] letters = line.trim().split("  ");
 
-    for (int j = 1; j < letters.length; j++) {
+    // System.out.print("\t");
+    // for (int i = 0; i < letters.length; i++) 
+    //   System.out.print(letters[i] + "\t");
+    // System.out.println();
+
+    for (int j = 0; j < letters.length; j++) {
       String letter = sc.next();
+      // System.out.print(letter + "\t");
       for (int i = 0; i < letters.length; i++) {
         int num = sc.nextInt();
+        // System.out.print(num + "\t");
         table.put(new Pair<>(letters[i], letter), num);
       }
+      // System.out.println();
     }
+    
     sc.close();
     return table;
   }
 
-  private static int optimal(String genA, int i, String genB, int j) {
+
+
+}
+
+class AlignmentSolver {
+  private Map<Pair<String, String>, Integer> table;
+  private Map<Pair<Integer, Integer>, Integer> cache = new HashMap<>();
+  private int solution;
+
+  public AlignmentSolver(Map<Pair<String, String>, Integer> table, String genA, String genB) {
+    this.table = table;
+    solution = solve(genA, genA.length()-1, genB, genB.length()-1);
+  }
+
+  private int solve(String genA, int i, String genB, int j) {
     var delta = table.get(new Pair<>("*", "A"));
     if (!cache.containsKey(new Pair<>(i,j))){
 
       if (i == 0 && j == 0) {
-        cache.put(new Pair<>(i,j), 0);
-        return 1;
+        cache.put(new Pair<>(i,j),
+          table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))));
       } else if (i == 0) {
-        cache.put(new Pair<>(i,j), delta * j);
-        return delta;
+        int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
+        int rest = delta * j;
+        cache.put(new Pair<>(i,j), cur + rest);
+
       } else if (j == 0) {
-        cache.put(new Pair<>(i,j), delta * i);
+        int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
+        int rest = delta * i;
+        cache.put(new Pair<>(i,j), cur + rest);
       } else {
         int matching = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))) 
-                        + optimal(genA, i-1, genB, j-1);                    
+                        + solve(genA, i-1, genB, j-1);                    
 
-        int dropA = delta + optimal(genA, i-1, genB, j);
-        int dropB = delta + optimal(genA, i, genB, j-1);
+        int dropA = delta + solve(genA, i-1, genB, j);
+        int dropB = delta + solve(genA, i, genB, j-1);
 
         cache.put(new Pair<>(i,j), Math.max(matching, Math.max(dropA, dropB)));
       }
     }
+
     return cache.get(new Pair<>(i,j));
   }
 
+  public int getSolution() {
+    return this.solution;
+  } 
 }
