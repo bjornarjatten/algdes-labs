@@ -6,7 +6,15 @@ import java.util.Scanner;
 
 class Pair<A,B> {
   private A fst;
+  public A getFst() {
+    return fst;
+  }
+
   private B snd;
+
+  public B getSnd() {
+    return snd;
+  }
 
   public Pair (A fst, B snd) {
     this.fst = fst;
@@ -61,8 +69,8 @@ public class Gorilla {
 
       String gen = String.join("", 
         sc.nextLine()//,
-        //sc.nextLine(),
-        //sc.nextLine()
+        // sc.nextLine(),
+        // sc.nextLine()
       );
 
       animalGenes.put(animal, gen);
@@ -82,20 +90,12 @@ public class Gorilla {
     Map<Pair<String, String>, Integer> table = new HashMap<>();
     String[] letters = line.trim().split("  ");
 
-    // System.out.print("\t");
-    // for (int i = 0; i < letters.length; i++) 
-    //   System.out.print(letters[i] + "\t");
-    // System.out.println();
-
     for (int j = 0; j < letters.length; j++) {
       String letter = sc.next();
-      // System.out.print(letter + "\t");
       for (int i = 0; i < letters.length; i++) {
         int num = sc.nextInt();
-        // System.out.print(num + "\t");
         table.put(new Pair<>(letters[i], letter), num);
       }
-      // System.out.println();
     }
     
     sc.close();
@@ -108,86 +108,129 @@ public class Gorilla {
 
 class AlignmentSolver {
   private Map<Pair<String, String>, Integer> table;
-  private Map<Pair<Integer, Integer>, Integer> cache = new HashMap<>();
+  private Map<Pair<Integer, Integer>, Pair<Integer, Pair<StringBuilder, StringBuilder>>> cache = new HashMap<>();
   private int solution;
-  private StringBuilder genAString;
-  private StringBuilder genBString;
+  private String a;
+  private String b;
 
   public AlignmentSolver(Map<Pair<String, String>, Integer> table, String genA, String genB) {
     this.table = table;
-    this.genAString = new StringBuilder();
-    this.genBString = new StringBuilder();
-    this.solution = solve(genA, genA.length()-1, genB, genB.length()-1);
+    var y = solve(genA, genA.length()-1, genB, genB.length()-1);
+    this.solution = y.getFst();
+    this.a = y.getSnd().getFst().toString();
+    this.b = y.getSnd().getSnd().toString();
   }
 
-  private int solve(String genA, int i, String genB, int j) {
+  private Pair<Integer, Pair<StringBuilder, StringBuilder>> solve(String genA, int i, String genB, int j) {
     var delta = table.get(new Pair<>("*", "A"));
     if (!cache.containsKey(new Pair<>(i,j))){
 
       if (i == 0 && j == 0) {
+        var x = new Pair<>(
+          new StringBuilder().append(genA.charAt(i)), 
+          new StringBuilder().append(genB.charAt(j))
+        );
+        var y = new Pair<>(
+          table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))),
+          x
+        );
         cache.put(
           new Pair<>(i,j),
-          table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))));
-          genAString.append(genA.charAt(i));
-          genBString.append(genA.charAt(j));
+          y
+        );
       } else if (i == 0) {
         int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
         int rest = delta * j;
 
-        genAString.append(genA.charAt(i));
-        genBString.append(genB.charAt(j));
+        var genAString = new StringBuilder().append(genA.charAt(i));
+        var genBString = new StringBuilder().append(genB.charAt(j));
 
         while (--j >= 0) {
           genAString.append('-');
           genBString.append(genB.charAt(j));
         }
-
-        cache.put(new Pair<>(i, j), cur + rest);
+        var x = new Pair<>(
+          genAString,
+          genBString
+        );
+        var y = new Pair<>(
+          cur + rest,
+          x
+        );
+        cache.put(
+          new Pair<>(i, j), 
+          y
+        );
       } else if (j == 0) {
         int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
         int rest = delta * i;
 
-        genAString.append(genA.charAt(i));
-        genBString.append(genB.charAt(j));
+        var genAString = new StringBuilder(genA.charAt(i));
+        var genBString = new StringBuilder(genB.charAt(j));
         
         while (--i >= 0) {
           genAString.append(genA.charAt(i));
           genBString.append('-');
         }
 
-        cache.put(new Pair<>(i,j), cur + rest);
+        var x = new Pair<>(
+          genAString,
+          genBString
+        );
+        var y = new Pair<>(
+          cur + rest,
+          x
+        );
+
+        cache.put(
+          new Pair<>(i,j), 
+          y
+        );
       } else {
+        var matchingSol = solve(genA, i-1, genB, j-1);
         int matching = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))) 
-                        + solve(genA, i-1, genB, j-1);                    
+                        + matchingSol.getFst();                    
 
-        int dropA = delta + solve(genA, i-1, genB, j);
-        int dropB = delta + solve(genA, i, genB, j-1);
+        var dropASol = solve(genA, i-1, genB, j);
+        int dropA = delta + dropASol.getFst();
+        
+        var dropBSol = solve(genA, i, genB, j-1);
+        int dropB = delta + dropBSol.getFst();
 
-        if (matching >= dropA && matching >= dropB) { // length was i+1,j+1 - must have appended max(i,j) chars to sA sB
-          int appendedPerBranch = Math.max(i,j);
-          genAString.delete(appendedPerBranch, genAString.length());
-          genBString.delete(appendedPerBranch, genBString.length());
-          genAString.append(""+genA.charAt(i));
-          genBString.append(""+genB.charAt(j));
+        Pair<Integer, Pair<StringBuilder, StringBuilder>> value;
+        if (matching >= dropA && matching >= dropB) {
+          var aa = matchingSol.getSnd().getFst().append(genA.charAt(i));
+          var bb = matchingSol.getSnd().getSnd().append(genB.charAt(j));
+          value = new Pair<>(
+            matching,
+            new Pair<>(aa, bb)
+          );
         } else if (dropA >= matching && dropA >= dropB) {
-          int appendedPerBranch = Math.max(i-1,j);
-          genAString.delete(0, appendedPerBranch);
-          genAString.delete(appendedPerBranch*2, genAString.length());
-          genAString.append(genA.charAt(i));
-
-          genBString.delete(appendedPerBranch*2, genBString.length());
-          genBString.delete(0, appendedPerBranch);
-          genBString.append('-');
+          var aa = dropASol.getSnd().getFst().append(genA.charAt(i));
+          var bb = dropASol.getSnd().getSnd().append('-');
+          value = new Pair<>(
+            dropA,
+            new Pair<>(aa, bb)
+          );
         } else {
-          int appendedPerBranch = Math.max(i,j-1);
-          genAString.delete(0, appendedPerBranch*2);
-          genBString.delete(0, appendedPerBranch*2);
-          genAString.append('-');
-          genBString.append(genB.charAt(j));         
+          var aa = dropBSol.getSnd().getFst().append('-');
+          var bb = dropBSol.getSnd().getSnd().append(genB.charAt(j));
+          value = new Pair<>(
+            dropB,
+            new Pair<>(aa, bb)
+          );     
         }
 
+        var aa = value.getSnd().getFst();
+        var bb = value.getSnd().getSnd();
+        System.out.println(aa.toString());
+        System.out.println(bb.toString());
 
-        cache.put(new Pair<>(i,j), Math.max(matching, Math.max(dropA, dropB)));
+
+        cache.put(
+          new Pair<>(i,j), 
+          value
+        );
       }
     }
 
@@ -199,7 +242,7 @@ class AlignmentSolver {
   } 
 
   public String getAlignment() {
-    return this.genAString.toString() + "\n" + this.genBString.toString();
+    return this.a + "\n" + this.b;
   }
 
 }
