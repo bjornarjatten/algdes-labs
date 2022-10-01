@@ -1,34 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
-class Pair<A,B> {
-  private A fst;
-  private B snd;
-
-  public Pair (A fst, B snd) {
-    this.fst = fst;
-    this.snd = snd;
-  }
-
-  public Pair<A,B> of(A fst, B snd) {
-    return new Pair<A,B>(fst,snd);
-  }
-
-  @Override public int hashCode() {
-    return ( ( 17 + fst.hashCode() ) << 31 + 5 ) + snd.hashCode();
-  }
-
-  @Override public boolean equals(Object other) {
-     if (other instanceof Pair<?,?>)
-      return this.fst.equals(((Pair<?,?>)other).fst) && 
-             this.snd.equals(((Pair<?,?>)other).snd);
-
-    return false;
-  }
-}
 
 public class Gorilla {
   static Map<Pair<String, String>, Integer> table;
@@ -106,100 +81,147 @@ public class Gorilla {
 
 }
 
-class AlignmentSolver {
-  private Map<Pair<String, String>, Integer> table;
-  private Map<Pair<Integer, Integer>, Integer> cache = new HashMap<>();
-  private int solution;
-  private StringBuilder genAString;
-  private StringBuilder genBString;
+class Pair<A,B> {
+  A fst;
+  B snd;
 
-  public AlignmentSolver(Map<Pair<String, String>, Integer> table, String genA, String genB) {
-    this.table = table;
-    this.genAString = new StringBuilder();
-    this.genBString = new StringBuilder();
-    this.solution = solve(genA, genA.length()-1, genB, genB.length()-1);
+  public Pair (A fst, B snd) {
+    this.fst = fst;
+    this.snd = snd;
   }
 
-  private int solve(String genA, int i, String genB, int j) {
-    var delta = table.get(new Pair<>("*", "A"));
-    if (!cache.containsKey(new Pair<>(i,j))){
+  @Override public int hashCode() {
+    return ( ( 17 + fst.hashCode() ) << 31 + 5 ) + snd.hashCode();
+  }
 
-      if (i == 0 && j == 0) {
-        cache.put(
-          new Pair<>(i,j),
-          table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))));
-          genAString.append(genA.charAt(i));
-          genBString.append(genA.charAt(j));
-      } else if (i == 0) {
-        int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
-        int rest = delta * j;
+  @Override public boolean equals(Object other) {
+     if (other instanceof Pair<?,?>)
+      return this.fst.equals(((Pair<?,?>)other).fst) && 
+             this.snd.equals(((Pair<?,?>)other).snd);
 
-        genAString.append(genA.charAt(i));
-        genBString.append(genB.charAt(j));
+    return false;
+  }
+}
 
-        while (--j >= 0) {
-          genAString.append('-');
-          genBString.append(genB.charAt(j));
-        }
+class Step {
+  static Step FINISHED = new Step(0,0);
+  static Step TAKE_LEFT = new Step(-1,0);
+  static Step TAKE_RIGHT = new Step(0,-1);
+  static Step TAKE_BOTH = new Step(-1,-1);
 
-        cache.put(new Pair<>(i, j), cur + rest);
-      } else if (j == 0) {
-        int cur = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
-        int rest = delta * i;
+  int di, dj;
+  public Step(int di, int dj) {this.di = di; this.dj = dj;}
+  public Pair<Integer, Integer> apply(Pair<Integer,Integer> state) {
+    return new Pair<>(state.fst + di, state.snd + dj);
+  }
 
-        genAString.append(genA.charAt(i));
-        genBString.append(genB.charAt(j));
-        
-        while (--i >= 0) {
-          genAString.append(genA.charAt(i));
-          genBString.append('-');
-        }
+  public boolean isFinished() {
+    return this.di == FINISHED.di && this.dj == FINISHED.dj;
+  }
+}
 
-        cache.put(new Pair<>(i,j), cur + rest);
-      } else {
-        int matching = table.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j))) 
-                        + solve(genA, i-1, genB, j-1);                    
+class AlignmentSolver {
 
-        int dropA = delta + solve(genA, i-1, genB, j);
-        int dropB = delta + solve(genA, i, genB, j-1);
+  private Map<Pair<String, String>, Integer> blosum;
+  private Map<Pair<Integer, Integer>, Step> opt = new HashMap<>();
+  private Map<Pair<Integer, Integer>, Integer> sco = new HashMap<>();
+  private String genA, genB;
+  private int delta; // gap cost
+  private int score;
+  private Pair<String,String> alignmnent;
 
-        if (matching >= dropA && matching >= dropB) { // length was i+1,j+1 - must have appended max(i,j) chars to sA sB
-          int appendedPerBranch = Math.max(i,j);
-          genAString.delete(appendedPerBranch, genAString.length());
-          genBString.delete(appendedPerBranch, genBString.length());
-          genAString.append(""+genA.charAt(i));
-          genBString.append(""+genB.charAt(j));
-        } else if (dropA >= matching && dropA >= dropB) {
-          int appendedPerBranch = Math.max(i-1,j);
-          genAString.delete(0, appendedPerBranch);
-          genAString.delete(appendedPerBranch*2, genAString.length());
-          genAString.append(genA.charAt(i));
-
-          genBString.delete(appendedPerBranch*2, genBString.length());
-          genBString.delete(0, appendedPerBranch);
-          genBString.append('-');
-        } else {
-          int appendedPerBranch = Math.max(i,j-1);
-          genAString.delete(0, appendedPerBranch*2);
-          genBString.delete(0, appendedPerBranch*2);
-          genAString.append('-');
-          genBString.append(genB.charAt(j));         
-        }
-
-
-        cache.put(new Pair<>(i,j), Math.max(matching, Math.max(dropA, dropB)));
-      }
-    }
-
-    return cache.get(new Pair<>(i,j));
+  public AlignmentSolver(Map<Pair<String, String>, Integer> table, String genA, String genB) {
+    this.blosum = table;
+    this.delta = blosum.get(new Pair<>("*", "A"));
+    this.genA = genA;
+    this.genB = genB;
+    // this call has the side-effect of populating the steps
+    this.score = solve(genA.length()-1, genB.length()-1);
+    // so now we can construct the alignment
+    computeAlignment(
+      pair(
+        genA.length()-1, 
+        genB.length()-1
+      ),
+      new StringBuilder(),
+      new StringBuilder(),
+      true
+    );
   }
 
   public int getScore() {
-    return this.solution;
-  } 
-
-  public String getAlignment() {
-    return this.genAString.toString() + "\n" + this.genBString.toString();
+    return score;
   }
 
+  public String getAlignment() {
+    return alignmnent.fst + "\n" + alignmnent.snd;
+  }
+
+  private void computeAlignment (Pair<Integer, Integer> ij, StringBuilder aSb, StringBuilder bSb, boolean setField) {
+    var step = opt.get(ij);
+    if (step.isFinished()) return;
+
+    computeAlignment(step.apply(ij), aSb, bSb, false);
+
+    var lChar = step.di != 0 ? genA.charAt(ij.fst) : '-';
+    var rChar = step.dj != 0 ? genB.charAt(ij.snd) : '-';
+
+    aSb.append(lChar);
+    bSb.append(rChar);
+
+    if (setField) {
+      this.alignmnent = new Pair<>(
+        aSb.toString(),
+        bSb.toString() 
+      );
+    }
+  }
+
+  private int solve(int i, int j) {
+    var ij = pair(i,j);
+
+    if (!sco.containsKey(ij)){
+      if (i == -1 && j == -1) {
+        opt.put(ij, Step.FINISHED);
+        sco.put(ij, 0);
+      } else if (i == 0 && j == 0) {
+        int cur = cost(i, j);
+        opt.put(ij, Step.TAKE_BOTH);
+        sco.put(ij, cur + solve(i-1,j-1));
+      } else if (i == -1) {
+        opt.put(ij, Step.TAKE_RIGHT);
+        sco.put(ij, delta + solve(i,j-1));
+      } else if (j == -1) {
+        opt.put(ij, Step.TAKE_LEFT);
+        sco.put(ij, delta + solve(i-1,j));
+      } else {
+
+        int left = delta + solve(i-1, j);
+        int both = cost(i,j) + solve(i-1, j-1);                    
+        int right = delta + solve(i, j-1);
+
+        if (both >= left && both >= right) {
+          opt.put(ij, Step.TAKE_BOTH);
+          sco.put(ij, both);
+        } else if (left >= both && left >= both) {
+          opt.put(ij, Step.TAKE_LEFT);
+          sco.put(ij, left);
+        } else { // right is only opt left
+          opt.put(ij, Step.TAKE_RIGHT);
+          sco.put(ij, right);
+        }
+      }
+    }
+
+    return sco.get(ij);
+  }
+
+  private int cost(int i, int j) {
+    return blosum.get(new Pair<>(""+genA.charAt(i), ""+genB.charAt(j)));
+  }
+
+  private static Pair<Integer,Integer> pair(int i, int j) {
+    return new Pair<>(i,j);
+  }
+  
 }
