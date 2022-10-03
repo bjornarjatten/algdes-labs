@@ -9,6 +9,7 @@ public class Gorilla {
   static Map<Pair<String, String>, Integer> table;
   static Map<String, String> animalGenes;
 
+
   public static void main(String[] args) throws FileNotFoundException {
     table = getBlosum();
     animalGenes = getAnimalGenes();
@@ -35,9 +36,9 @@ public class Gorilla {
       String animal = sc.nextLine().split(" ")[0].replace('>', Character.MIN_VALUE);
 
       String gen = String.join("", 
-        sc.nextLine()//,
-        //sc.nextLine(),
-        //sc.nextLine()
+        sc.nextLine(),
+        sc.nextLine(),
+        sc.nextLine()
       );
 
       animalGenes.put(animal, gen);
