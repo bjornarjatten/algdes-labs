@@ -21,18 +21,19 @@ public class Flow {
 
     int m = sc.nextInt();
     
-    originalPaths = new Edge[m]; 
+    originalPaths = new Edge[m*2]; 
 
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < m * 2; i += 2){
       int u = sc.nextInt();
       int v = sc.nextInt();
       int c = sc.nextInt();
       if (c == -1)
         c = Integer.MAX_VALUE;
       originalPaths[i] = new Edge(u, v, c);
+      originalPaths[i + 1] = new Edge(v, u, c);
     }
 
-    Arrays.sort(originalPaths);
+    // Arrays.sort(originalPaths, Collections.reverseOrder());
     sc.close(); 
 
     System.out.println(fordFulkerson());
@@ -43,7 +44,11 @@ public class Flow {
     
     var foundPath = findPath(0);
     while (foundPath.size() > 0) {
+      var before = flow;
       flow += augment(foundPath);
+      if ( flow - before <= 0 ) {
+        System.out.println("0 flow augment");
+      }
       foundPath = findPath(0);
     }
 
@@ -63,8 +68,10 @@ public class Flow {
       newP.add(reversed);
     }
     
-    
     for (Edge edge : originalPaths) {
+      // Collections.
+      // p.stream().findFirst(e -> edge.u == e.u && edge.v == e.v && edge.c == e.c)
+
       for (Edge edge2 : p) {
         if (edge.u == edge2.u && edge.v == edge2.v && edge.c == edge2.c) {
           continue;
@@ -75,14 +82,13 @@ public class Flow {
 
     Edge[] x = new Edge[newP.size()];
     x = newP.toArray(x);
-    Arrays.sort(x);
+    // Arrays.sort(x, Collections.reverseOrder());
     originalPaths = x;
     return b;
   }
 
   /**
    * Finds a path from origins to destinations.
-   * @throws Exception
    */
   public static ArrayList<Edge> findPath(int i) {
     ArrayList<Edge> fromStations = new ArrayList<Edge>();
@@ -132,11 +138,12 @@ class Edge implements Comparable<Edge> {
 
   @Override
   public int compareTo(Edge other){  
-    if(c== other.c)  
+    if(c == other.c)  
       return 0;  
     else if(c > other.c)  
       return 1;  
     else  
-      return -1;  
+      return -1;
   } 
 }
+
