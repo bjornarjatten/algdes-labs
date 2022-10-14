@@ -28,7 +28,7 @@ public class Flow2 {
     var ff = new FordFulkerson(g, 0, 54);
     System.out.println(ff.maxflow);
     for (var s : ff.minCut) {
-      System.out.println(s);
+      System.out.println(String.format("%d %d %d", s.u, s.v, g.V.get(s.v).get(s.u).c/2));
     }
     
     sc.close();
@@ -117,27 +117,14 @@ class FordFulkerson {
     
     for (int i = 0; i < g.V.size(); i++) {
       if (marked.contains(i)) {
-        // System.out.println(g.V.get(i).entrySet().size());
-        if (g.V.get(i).entrySet().size() == 2){
-          int u = -1;
-          int v = -1;
-          int c = -1;
-
-          for (var entry : g.V.get(i).entrySet()) {
-            var edge = entry.getValue();
-            if (edge.c == 0){
-              u = edge.u;
-              v = edge.v;
-            } else {
-              c = edge.c;
-            }
+        for ( Edge e : g.V.get(i).values() ) {
+          if (e.c == 0 && !marked.contains(e.v)) {
+            cut.add(e);
           }
-          cut.add(new Edge(u, v, c, 0));
-        }  
-        
-        // check all  
+        }
       }
     }
+
     return cut;
   }
 }
