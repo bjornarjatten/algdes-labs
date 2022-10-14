@@ -1,149 +1,130 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Scanner;
+import java.util.*;
 
 public class Flow {
-  
-  public static String[] stations;
-  public static Edge[] originalPaths;
 
   public static void main(String[] args) {
     var sc = new Scanner(System.in);
-
     int n = Integer.parseInt(sc.nextLine());
 
-    stations = new String[n];
-
+    var stations = new String[n];
     for(int i = 0; i < n; i++){
       stations[i] = sc.nextLine();
     }
 
     int m = sc.nextInt();
-    
-    originalPaths = new Edge[m*2]; 
+        
+    var g = new Graph(m*2);
 
-    for(int i = 0; i < m * 2; i += 2){
+    for(int i = 0; i < m; i++) {
       int u = sc.nextInt();
       int v = sc.nextInt();
       int c = sc.nextInt();
       if (c == -1)
         c = Integer.MAX_VALUE;
-      originalPaths[i] = new Edge(u, v, c);
-      originalPaths[i + 1] = new Edge(v, u, c);
+      g.V.get(u).put(v, new Edge(u,v,c,0));
+      g.V.get(v).put(u, new Edge(v,u,c,0));
     }
 
-    // Arrays.sort(originalPaths, Collections.reverseOrder());
-    sc.close(); 
-
-    System.out.println(fordFulkerson());
-  }
-
-  public static int fordFulkerson() {
-    int flow = 0;
-    
-    var foundPath = findPath(0);
-    while (foundPath.size() > 0) {
-      var before = flow;
-      flow += augment(foundPath);
-      if ( flow - before <= 0 ) {
-        System.out.println("0 flow augment");
-      }
-      foundPath = findPath(0);
-    }
-
-    return flow;
-  }
-
-  public static int augment(ArrayList<Edge> p){
-    // bottleneck / minimum
-    int b = Collections.min(p).c;
-
-    ArrayList<Edge> newP = new ArrayList<Edge>();
-
-    for (Edge edge : p) {
-      var updatedOld = new Edge(edge.u, edge.v, edge.c - b);
-      var reversed = new Edge(edge.v, edge.u, b);
-      newP.add(updatedOld);
-      newP.add(reversed);
+    var ff = new FordFulkerson(g, 0, 54);
+    System.out.println(ff.maxflow);
+    for (var s : ff.minCut) {
+      System.out.println(String.format("%d %d %d", s.u, s.v, g.V.get(s.v).get(s.u).c/2));
     }
     
-    for (Edge edge : originalPaths) {
-      // Collections.
-      // p.stream().findFirst(e -> edge.u == e.u && edge.v == e.v && edge.c == e.c)
-
-      for (Edge edge2 : p) {
-        if (edge.u == edge2.u && edge.v == edge2.v && edge.c == edge2.c) {
-          continue;
-        }
-        newP.add(edge);
-      } 
-    }
-
-    Edge[] x = new Edge[newP.size()];
-    x = newP.toArray(x);
-    // Arrays.sort(x, Collections.reverseOrder());
-    originalPaths = x;
-    return b;
-  }
-
-  /**
-   * Finds a path from origins to destinations.
-   */
-  public static ArrayList<Edge> findPath(int i) {
-    ArrayList<Edge> fromStations = new ArrayList<Edge>();
-    
-    for (Edge edge : originalPaths) {
-      int currentStartIndex = edge.u;
-      if (currentStartIndex == i) {
-
-        int nextStationIndex = edge.v;
-        if(nextStationIndex == 54){
-          var result = new ArrayList<Edge>();
-          result.add(edge);
-          return result;
-        }
-
-        fromStations.add(edge);
-      }
-    }
-
-    for (Edge edge : fromStations){
-      int nextStationIndex = edge.v;
-      var optimal = findPath(nextStationIndex);
-      if (optimal.size() > 0) {
-        optimal.add(edge);
-        return optimal;
-      }
-    }
-
-    return new ArrayList<>();
+    sc.close();
   }
 }
 
-class Edge implements Comparable<Edge> {
-  int u;
-  int v;
-  int c;
-  public Edge(int u, int v, int c) {
-    this.u = u;
-    this.v = v;
-    this.c = c;
+class Edge {
+  int u,v,c;
+  public Edge(int u, int v, int c, int f) {
+    this.u = u; this.v = v; this.c = c;
   }
 
   @Override
   public String toString() {
-    return "from " + u + " to " + v + " with c " + c;
+    return u + " " + v + " " + c;
   }
-
-  @Override
-  public int compareTo(Edge other){  
-    if(c == other.c)  
-      return 0;  
-    else if(c > other.c)  
-      return 1;  
-    else  
-      return -1;
-  } 
 }
 
+class Graph {
+  ArrayList<Map<Integer,Edge>> V;
+  public Graph(int n) {
+    this.V = new ArrayList<>(n);
+    for (int i = 0; i < n; i++) {
+      this.V.add(new HashMap<>());
+    }
+  }
+}
+
+class FordFulkerson {
+  static int init_threshold = 1;
+  int maxflow = 0;
+  ArrayList<Edge> minCut;
+  public FordFulkerson(Graph g, int source, int sink){
+    computeMaxFlow(g, source, sink);
+    this.minCut = computeMinCut(g, sink, source);
+  }
+
+  int augment(Graph g, int current, int sink, int flow, Set<Integer> seen, int threshold) {
+    if (current == sink) {
+      return flow;
+    } else if (!seen.contains(current)) {
+      seen.add(current);
+      for (var nxt : g.V.get(current).values()) {
+        if (nxt.c >= threshold){
+          int increase = augment(g, nxt.v, sink, Math.min(flow, nxt.c), seen, threshold);
+          if (increase > 0) {
+            nxt.c -= increase;
+            g.V.get(nxt.v).get(nxt.u).c += increase;
+            return increase;
+          }
+        }
+      }
+    }
+
+    return 0;
+  }
+
+  void computeMaxFlow(Graph g, int source, int sink){
+    int inf = Integer.MAX_VALUE;
+    int flow = 0, threshold = init_threshold, increase;
+
+    while (threshold != 0) {
+      increase = -1;
+      while (increase != 0) {
+        increase = augment(
+          g,
+          source,
+          sink,
+          inf,
+          new HashSet<Integer>(g.V.size()),
+          threshold
+        );
+        flow += increase;
+      }
+      threshold /= 2;
+    } 
+
+    this.maxflow = flow;
+  }
+
+  ArrayList<Edge> computeMinCut(Graph g, int sink, int source) {
+    var cut = new ArrayList<Edge>(); 
+    var marked = new HashSet<Integer>();
+
+    augment(g,source,sink,1,marked,1);
+    
+    for (int i = 0; i < g.V.size(); i++) {
+      if (marked.contains(i)) {
+        for ( Edge e : g.V.get(i).values() ) {
+          if (e.c == 0 && !marked.contains(e.v)) {
+            cut.add(e);
+          }
+        }
+      }
+    }
+
+    return cut;
+  }
+}

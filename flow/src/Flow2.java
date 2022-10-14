@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Flow2 {
+public class Flow {
 
   public static void main(String[] args) {
     var sc = new Scanner(System.in);

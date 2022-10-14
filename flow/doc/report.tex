@@ -9,7 +9,7 @@
 
 
 \title{Flow Report}
-\author{Anatoli Cooper and Boris Marley}
+\author{Bjarke Brodin (bjal), Bjørnar Haugstad Jåtten (bjja), Helle Friis (hefr) and Simon Boye Jørgensen (sboj)}
 
 \begin{document}
   \maketitle
@@ -17,62 +17,68 @@
   \section{Results}
 
   Our implementation successfully computes a flow of 163 on the input file, confirming the analysis of the American enemy.
-  \sidenote{%
-  Complete the report by filling in your correct names,
-  filling in the parts marked $[\ldots]$,
-  and changing other parts wherever necessary.
-  Remove the sidenotes in your final hand-in.
-  Insert `comrades!' and `for the motherland' wherever you see fit.
-  }
+  For the motherland.
 
   We have analysed the possibilities of decreasing the capacities near Minsk.
-  Our analysis is summaries in the following table:\sidenote{%
-    Complete and correct the table.
-  }
+  Our analysis is summaries in the following table:
 
 \bigskip
   \begin{tabular}{rccc}\toprule
     Case & 4W--48 & 4W--49 & Effect on flow \\\midrule
     1& 30& 20 & no change \\
-    2& 20 &30 & no change \\
-    3&20 & 20& $-10$ \\
-    $[\ldots]$ \\\bottomrule
+    2& 30& 10 & no change \\
+    3& 20 &30 & no change \\
+    4& 10 &30 & no change \\
+    5& 20 & 20& no change \\
+    6& 20 & 10& 153 (-10) \\
+    7& 10 & 20& 153 (-10) \\
+    8& 10 & 10& 143 (-20) \\
+    \\\bottomrule
   \end{tabular}
   \bigskip
 
-  In case 4, the new bottleneck becomes
-  \begin{quote}
-      1--44, 3--2, $[\ldots]$
+  In case 6, the new bottleneck becomes
+  \begin{quote} 
+    10--2, 11--24, 11--25, 12--23, 18--22, 20--21, 20--23, 27--2, 28--30    
   \end{quote}
-  The comrade from Minsk is advised to $[\ldots]$.
+
+  In case 7, the new bottleneck becomes
+  \begin{quote}
+    10 25, 11--24, 11--25, 12--23, 18--22, 20--21, 20--23, 27--2, 28--30
+  \end{quote}
+
+  In case 8, the new bottleneck becomes
+  \begin{quote}
+      10--25, 11--24, 11--25, 12--23, 18--22, 20--21, 20--23, 27--26, 28--30
+  \end{quote}
+  The comrade from Minsk is advised to use case 2, 4 or 5, 
+  to decrease the capacity as much as possible while preserving the maximum flow.
 
   \section{Implementation details}
 
-  We use a straightforward implementation of Bellman--Quine's flow algorithm as described in Bronstein, \emph{Foundations of Algorithms}, chap.~6.
-  We use Prim's algorithm to find an augmenting path and also implement the neat trick of flow by recomputing the inverse of the antisnail every 2nd iteration.\sidenote{%
+  We use a straightforward implementation of Ford-Fulkerson's flow algorithm as described in Kleinberg and Tardos, \emph{Algorithms Design}, S.7.1.
+  We use Depth-First-Search to find an augmenting path and also implement the neat trick of flow by $[\ldots]$\sidenote{%
     Replace by a description of what you actually do.
   }
 
   The running time is $[\ldots]$.
 
-  We have implemented each undirected edge in the input graph as a $[\ldots]$.
-  In the corresponding residual graph, the edge is represented by a $[\ldots]$.
+  We have implemented each undirected edge in the input graph as two directed edges in each direction.
+  In the corresponding residual graph, the edge is represented by an object of the Edge class.
   Our datatype for edge is this:
-  \sidenote{%
-    What I wrote here is complete nonsense, of course.
-    Replace by a description of your actual implementation---what \emph{did} you use?
-    A pair of directed edges?
-    A single undirected edges with a bit to see in which direction the flow goes?
-    As indicated, it makes sense to actually include your datatype for edge in the report.
-    Here, and in general, it makes sense to have written short and sweet code.
-  }
   \begin{verbatim}
-    class FlowEdge
-    {
-      Vertex from, to;
-      GUISwingComponentFactory bar;
-      Edge next, parent, foo;
+    class Edge {
+      int u,v,c;
+      public Edge(int u, int v, int c, int f) {
+        this.u = u; this.v = v; this.c = c;
+      }
+
+      @Override
+      public String toString() {
+        return u + " " + v + " " + c;
+      }
     }
+  Compares! For the motherland!
   \end{verbatim}
 
 
