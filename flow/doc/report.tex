@@ -57,13 +57,11 @@
   \section{Implementation details}
 
   We use a straightforward implementation of Ford-Fulkerson's flow algorithm as described in Kleinberg and Tardos, \emph{Algorithms Design}, S.7.1.
-  We use Depth-First-Search to find an augmenting path and also implement the neat trick of flow by $[\ldots]$\sidenote{%
-    Replace by a description of what you actually do.
-  }
+  We use Depth-First-Search to find an augmenting path.
 
-  The running time is $[\ldots]$.
+  The running time is $O(mnC)$ where $C$ is the max flow.
 
-  We have implemented each undirected edge in the input graph as two directed edges in each direction.
+  We have implemented each undirected edge in the input graph as two directed edges (one in each direction).
   In the corresponding residual graph, the edge is represented by an object of the Edge class.
   Our datatype for edge is this:
   \begin{verbatim}
@@ -78,8 +76,8 @@
         return u + " " + v + " " + c;
       }
     }
-  Compares! For the motherland!
   \end{verbatim}
 
+  Comrades! For the motherland!
 
 \end{document}
