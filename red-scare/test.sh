@@ -14,10 +14,14 @@ function run {
     mkdir './results'
   fi
 
-  result=$(g++ -std=c++17 -O2 -o "./build/$algoname" $algofiles && \
-           eval "./build/$algoname < ./data/$file")
-  echo $result
-  # eval "./build/$algoname < ./data/$file > $outputfile"
+  if ! [[ -f "./build/$algoname" ]]; then
+    echo "Compiling $algoname..."
+    g++ -std=c++17 -O3 -o "./build/$algoname" $algofiles
+  fi
+
+  result=$(eval "./build/$algoname < ./data/$file")
+  echo -e "$result\t$algoname\t$file" > $outputfile
+  echo -e "$result\t$algoname\t$file"
 }
 
 algos=(\
@@ -30,12 +34,17 @@ algos=(\
 
 names=(\
   "alternate" \
-  "few" \
-  "some" \
-  "many" \
-  "none" \
+  "few      " \
+  "some     " \
+  "many     " \
+  "none     " \
 )
 
+if [[ $1 == 'compile' ]]; then
+  if [[ -d './build' ]]; then
+    rm ./build/*
+  fi
+fi
 
 for i in {0..4}; do
   algoname=${names[$i]}
