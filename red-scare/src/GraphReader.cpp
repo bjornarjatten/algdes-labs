@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <map>
+#include <string>
 
 using namespace std;
 
@@ -30,53 +32,48 @@ class Graph {
 
 Graph loadGraph()
 {
-  // ios_base::sync_with_studio(0);
-  // cin.tie(0);
-  
+  map<string, int> names; 
   string redSymbol;
   int V, E, R;
   cin >> V >> E >> R;
-  int S, T;
-  cin >> S >> T;
-  Graph G { S, T };
+  string Sname, Tname;
+  cin >> Sname >> Tname;
+  Graph G;
   
   for (int i = 0; i < V; i++)
   {
-    int v; 
-    cin >> v;
+    string name; 
+    cin >> name;
+    names[name] = i;
+
     if (cin.peek() == 32) 
     {
       cin >> redSymbol;
-      G.vertices.emplace_back(Vertex{v, true});
+      G.vertices.emplace_back(Vertex{i, true});
     } 
     else 
     {
-      G.vertices.emplace_back(Vertex{v, false});
+      G.vertices.emplace_back(Vertex{i, false});
     }
 
   }
   
+
   for (int i = 0; i < E; i++)
   {
+    string uname, vname;
     int u, v;
     string dashes;
-    cin >> u >> dashes >> v;
+    cin >> uname >> dashes >> vname;
+    u = names[uname];
+    v = names[vname];
+
     G.edges.emplace_back(Edge{ u, v });
+    if(dashes.find(">") == string::npos) G.edges.emplace_back(Edge{ v, u });
   }
+
+  G.s = names[Sname];
+  G.t = names[Tname];
 
   return G;
 }
-
-// int main() 
-// {
-//   auto [vertices, edges] = loadGraph();
-//   // for (Vertex v : vertices) 
-//   // {
-//   //   cout << v.id << ", is red: " << v.isRed << "\n";
-//   // }
-//   // for (Edge e : edges) 
-//   // {
-//   //   cout << e.u << " -- " << e.v << "\n";
-//   // }
-//   return 0;
-// }

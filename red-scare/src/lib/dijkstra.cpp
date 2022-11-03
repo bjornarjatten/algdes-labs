@@ -105,6 +105,54 @@ int dijkstra(std::vector<std::vector<std::pair<int, int>>> *adj, int s, int t) {
     if (dist[t] != INF) {
         return dist[t];
     }
+
     return -1;
 }
+
+int dijkstraWithDefault(std::vector<std::vector<std::pair<int, int>>> *adj, int s, int t, int def) {
+    /// n denotes the number of vertices in graph
+    int n = adj->size();
+
+    /// setting all the distances initially to INF
+    std::vector<int64_t> dist(n, INF);
+
+    /// creating a min heap using priority queue
+    /// first element of pair contains the distance
+    /// second element of pair contains the vertex
+    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>,
+                        std::greater<std::pair<int, int>>>
+        pq;
+
+    /// pushing the source vertex 's' with 0 distance in min heap
+    pq.push(std::make_pair(0, s));
+
+    /// marking the distance of source as 0
+    dist[s] = 0;
+
+    while (!pq.empty()) {
+        /// second element of pair denotes the node / vertex
+        int currentNode = pq.top().second;
+
+        /// first element of pair denotes the distance
+        int currentDist = pq.top().first;
+
+        pq.pop();
+
+        /// for all the reachable vertex from the currently exploring vertex
+        /// we will try to minimize the distance
+        for (std::pair<int, int> edge : (*adj)[currentNode]) {
+            /// minimizing distances
+            if (currentDist + edge.second < dist[edge.first]) {
+                dist[edge.first] = currentDist + edge.second;
+                pq.push(std::make_pair(dist[edge.first], edge.first));
+            }
+        }
+    }
+    if (dist[t] != INF) {
+        return dist[t];
+    }
+
+    return def;
+}
+
 }  // namespace graph
