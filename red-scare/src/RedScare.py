@@ -110,47 +110,6 @@ def redscare_many(G, R, s, t):
     dist, path = djikstra(G, s, t)
     return -dist if dist is not None else None
 
-def redscare_many_force_enumerate(G, R, s, t):
-    from itertools import permutations
-    m = -1
-    keys = set(G.keys())
-    keys.remove(s)
-    keys.remove(t)
-    keys = list(keys)
-
-    for i in range(1 << len(keys)):
-        w = 0
-        prev = [s]
-        for k in range(len(keys)):
-            if not (1 << k) & i: continue
-            u = keys[k]
-            v = prev[-1]
-            if u in G[v]: 
-                w += G[v][u]
-            else: 
-                w = -1
-                break
-
-            prev.append(keys[k])
-
-        if w > 0 and t in G[prev[-1]]:
-            w += G[prev[-1]][t]
-            m = max(m, w)
-
-    return m
-
-def redscare_many_force_prune(G, R, s, t):
-    from itertools import permutations
-    m = -1
-    pairs = set()
-    for v,es in G.items():
-        for u in es:
-            pairs.add((v,u))
-            pairs.add((u,v))
-
-    return m
-
-
 
 
 n,m,r = map(int, input().split())
@@ -208,20 +167,16 @@ print('alternate', 'true' if alternate else 'false')
 few_dist = redscare_few(G, R, s, t)
 print('few      ', few_dist if few_dist is not None else '-1')
 
-if is_cyclic(G, s) and len(G) > 0 and n >= brute_force_limit:
-    print('many     ', f'G is cyclic, |R`|={len(R)} |V`|={len(G)}')
-    print('some     ', f'G is cyclic, |R`|={len(R)} |V`|={len(G)}')
-elif len(R) == 0:
+if len(R) == 0:
     many_dist = redscare_none(G, R, s, t)
     print('many     ', 0 if many_dist is not None else '-1')
     print('some     ', 'false')   
-elif len(G) < brute_force_limit:
-    many_dist = redscare_many_force_enumerate(G, R, s, t)
-    print('many     ', many_dist if many_dist is not None else '-1')
-    some = many_dist is not None and many_dist > 0
-    print('some     ', 'true' if some else 'false')
-else:
+elif not is_cyclic(G, s):
     many_dist = redscare_many(G, R, s, t)
     print('many     ', many_dist if many_dist is not None else '-1')
     some = many_dist is not None and many_dist > 0
     print('some     ', 'true' if some else 'false')
+else:
+    print('many     ', f'G is cyclic, |R`|={len(R)} |V`|={len(G)}')
+    print('some     ', f'G is cyclic, |R`|={len(R)} |V`|={len(G)}')
+
