@@ -47,7 +47,7 @@ def is_cyclic(g, s):
 
 
 
-def djikstra(g, s, t):
+def shortest_path(g, s, t):
     from heapq import heappush, heappop
 
     path_to = {s: s}
@@ -77,13 +77,33 @@ def djikstra(g, s, t):
 
 
 
+def all_paths(g, s, t):
+    import sys
+    sys.setrecursionlimit(10**6)
+    def dfs_paths(v, path):
+        for u, w in g[v].items():
+            # if we took u -> v then discard v -> u 
+            if len(path) > 1 and u == path[-2]: continue
+            if u in path: continue 
+
+            path.append(u)
+            if u == t: yield list(path)
+            yield from dfs_paths(u, path)
+            path.pop()
+
+    return dfs_paths(s, [s])
+
+
+
+
+
 def redscare_none(G, R, s, t):
     G = {
         v: {u: w for u, w in es.items() if u == s or u == t or u not in R} 
         for v, es in G.items() if v == s or v == t or not v in R
     } 
 
-    dist, path = djikstra(G, s, t)
+    dist, path = shortest_path(G, s, t)
     return dist
 
 def redscare_alternate(G, R, s, t):
@@ -92,14 +112,14 @@ def redscare_alternate(G, R, s, t):
         for v, es in G.items()
     } 
 
-    return any(djikstra(G, s, t))
+    return any(shortest_path(G, s, t))
 
 def redscare_few(G, R, s, t):
     G = {
         v: {u: (1 if u in R else 0) for u, w in es.items() }
         for v, es in G.items()
     }
-    dist, path = djikstra(G, s, t)
+    dist, path = shortest_path(G, s, t)
     return dist
 
 def redscare_many(G, R, s, t):
@@ -107,8 +127,15 @@ def redscare_many(G, R, s, t):
         v: {u: (-1 if u in R else 0) for u, w in es.items() }
         for v, es in G.items()
     }
-    dist, path = djikstra(G, s, t)
+    dist, path = shortest_path(G, s, t)
     return -dist if dist is not None else None
+
+def redscare_many_brute(G, R, s, t):
+    paths = all_paths(G,s,t)
+    if paths:
+        return max([sum([1 if v in R else 0 for v in path]) for path in all_paths(G,s,t)])
+    else:
+        return None
 
 
 
@@ -136,12 +163,18 @@ for i in range(m):
 
 
 
+import sys
+print()
+print(sys.argv[1])
+
 s,t = V[s], V[t]
 # Is s and t in the same component?
 if UF.find(s) != UF.find(t): 
   print('none     ', '-1')
   print('alternate', 'false')
   print('few      ', '-1')
+  print('many     ', '-1')
+  print('some     ', 'false')
   exit()
 
 C = UF.find(s)
@@ -173,6 +206,11 @@ if len(R) == 0:
     print('some     ', 'false')   
 elif not is_cyclic(G, s):
     many_dist = redscare_many(G, R, s, t)
+    print('many     ', many_dist if many_dist is not None else '-1')
+    some = many_dist is not None and many_dist > 0
+    print('some     ', 'true' if some else 'false')
+elif len(G) < brute_force_limit:
+    many_dist = redscare_many_brute(G, R, s, t)
     print('many     ', many_dist if many_dist is not None else '-1')
     some = many_dist is not None and many_dist > 0
     print('some     ', 'true' if some else 'false')
