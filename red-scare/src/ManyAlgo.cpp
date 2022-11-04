@@ -42,15 +42,15 @@ int main()
   setupLibraryGraph(&adj, G, cycG);
 
   if (Cycle::CycleCheck::isCyclicBFS(*cycG)) {
-    cout << "Graph is cyclic\n";
+    cout << "-\n";
     return 0;
   }
 
   int dist = graph::dijkstraWithDefault(&adj, G.s, G.t, 1);
   if (dist == 1) {
-    cout << "Target not reachable from source\n";
+    cout << "-1";
   } else {
-    cout << "Max RED Path Distance : " << -dist << "\n";
+    cout << -dist << "\n";
   }
   return 0;
 }

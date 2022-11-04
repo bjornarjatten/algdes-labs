@@ -1,0 +1,1 @@
+-	many	wall-z-1000.txt

@@ -35,9 +35,9 @@ int main()
   int dist = graph::dijkstra(&adj, G.s, G.t);
   // cout << "s: " << G.s << ", t: " << G.t << "\n";
   if (dist == -1) {
-    cout << "Target not reachable from source\n";
+    cout << "-1\n";
   } else {
-    cout << "Shortest Path Distance : " << dist << "\n";
+    cout << dist << "\n";
   }
   return 0;
 }

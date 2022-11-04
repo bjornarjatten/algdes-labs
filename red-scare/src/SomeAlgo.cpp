@@ -36,7 +36,7 @@ int main()
   setupLibraryGraph(&adj, G, cycG);
 
   if (Cycle::CycleCheck::isCyclicBFS(*cycG)) {
-    cout << "Graph is cyclic\n";
+    cout << "-\n";
     return 0;
   }
 
