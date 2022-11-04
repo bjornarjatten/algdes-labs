@@ -188,7 +188,7 @@ G = {
 
 # Adjust R to only relevant component
 R = [k for k in G if k in R]
-brute_force_limit = 25
+brute_force_limit = 14 # theoretically solvable in order of seconds
 
 
 none_dist = redscare_none(G, R, s, t)
@@ -209,7 +209,7 @@ elif not is_cyclic(G, s):
     print('many     ', many_dist if many_dist is not None else '-1')
     some = many_dist is not None and many_dist > 0
     print('some     ', 'true' if some else 'false')
-elif len(G) < brute_force_limit:
+elif len(G) < brute_force_limit: # constant time algorithm, factor 14!
     many_dist = redscare_many_brute(G, R, s, t)
     print('many     ', many_dist if many_dist is not None else '-1')
     some = many_dist is not None and many_dist > 0
