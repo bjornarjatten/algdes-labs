@@ -1,3 +1,5 @@
+from math import inf
+from collections import deque
 
 class UnionFind:
   def __init__(self, V):
@@ -94,6 +96,42 @@ def all_paths(g, s, t):
     return dfs_paths(s, [s])
 
 
+def fdfs(graph, source, sink, lvl, flow, seen):
+  if source == sink:
+    return flow
+  if source not in seen:
+    seen.add(source)
+    for nxt,cap in graph[source].items():
+      if cap >= 1 and source in lvl and nxt in lvl and lvl[source] < lvl[nxt]:
+        delta = fdfs(graph, nxt, sink, lvl, min(flow, cap), seen)
+        if delta >= 1:
+          graph[source][nxt] -= delta
+          graph[nxt][source] += delta
+          return delta
+  return 0
+
+def lvlbfs(g, s, t):
+  lvl = {s:0}
+  q = deque([(s,0)])
+  while q:
+    v,vlvl = q.pop()
+    if v == t: 
+      lvl[v] = vlvl + 1
+      break
+    for w,c in g[v].items():
+      if w in lvl or c == 0: continue 
+      lvl[w] = vlvl + 1
+      q.appendleft((w, vlvl + 1))
+  return lvl
+
+def flow(G, source, sink, flow=0):
+  levels = lvlbfs(G, source, sink)
+  if sink not in levels: return flow
+  increase = inf
+  while increase > 0:
+    increase = fdfs(G,source,sink,levels,inf,set())
+    flow += increase
+  return flow(G, source, sink, flow=flow) 
 
 
 
@@ -142,8 +180,6 @@ def redscare_many_brute(G, R, s, t):
 n,m,r = map(int, input().split())
 s,t = input().split()
 
-if n > 1000: exit()
-
 R = set()
 V = {}
 G = {v: {} for v in range(n)}
@@ -160,10 +196,6 @@ for i in range(m):
   G[V[u]][V[v]] = 1
   if e != '->': G[V[v]][V[u]] = 1
 
-
-
-
-import sys
 
 s,t = V[s], V[t]
 # Is s and t in the same component?
@@ -212,6 +244,7 @@ else:
     many = '?!'
     some = '?!'
 
+import sys
 if len(sys.argv) > 2 and sys.argv[2] == 'large' and len(G) < 500:
     exit()
 

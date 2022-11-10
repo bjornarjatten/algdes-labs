@@ -81,8 +81,28 @@ $O((|E|+|V|) \log |V|)$.
 
 
 \subsection{Many}
-% much math
+We solve many for directed acyclic graphs,
+by using much the same approach as in few,
+only, instead of setting 1 weighted red arcs,
+we use -1 weighed red arcs.
+Running shortest path then yields the negation
+of our desired result.
+We take care to use a shortest path algorithm
+that does not stop early when reaching a valid path,
+but rather examines all options.
+
+In the general case we cannot solve many,
+because the general case includes $R = G$.
+Solving many in this case implies solving 
+the longest path problem exactly, 
+and since this is known to be NP-hard
+we can safely give up.
+
 \subsection{Some}
+First we just on the background of many decided wether that Some was possible or not. 
+Now we solve it in a more independent way by making it to a flow problem. 
+... 
+
 %see many - much math
 
 For problem A, I solved each instance $G$ by $\cdots$\footnote{Describe what you did.
