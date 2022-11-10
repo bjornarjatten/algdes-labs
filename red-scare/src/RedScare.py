@@ -170,11 +170,11 @@ print(sys.argv[1])
 s,t = V[s], V[t]
 # Is s and t in the same component?
 if UF.find(s) != UF.find(t): 
-  print('none     ', '-1')
-  print('alternate', 'false')
-  print('few      ', '-1')
-  print('many     ', '-1')
-  print('some     ', 'false')
+  print('false', end='\t')
+  print('-1', end='\t')
+  print('-1', end='\t')
+  print('-1', end='\t')
+  print('false', end='\t')
   exit()
 
 C = UF.find(s)
@@ -190,31 +190,33 @@ G = {
 R = [k for k in G if k in R]
 brute_force_limit = 14 # theoretically solvable in order of seconds
 
-
-none_dist = redscare_none(G, R, s, t)
-print('none     ', none_dist if none_dist else '-1')
-
 alternate = redscare_alternate(G, R, s, t)
-print('alternate', 'true' if alternate else 'false')
 
 few_dist = redscare_few(G, R, s, t)
-print('few      ', few_dist if few_dist is not None else '-1')
+few = few_dist if few_dist else '-1'
+
+none_dist = redscare_none(G, R, s, t)
+none = none_dist if none_dist else '-1'
 
 if len(R) == 0:
     many_dist = redscare_none(G, R, s, t)
-    print('many     ', 0 if many_dist is not None else '-1')
-    print('some     ', 'false')   
+    some = 'false'
+    many = 0 if many_dist is not None else '-1'
 elif not is_cyclic(G, s):
     many_dist = redscare_many(G, R, s, t)
-    print('many     ', many_dist if many_dist is not None else '-1')
-    some = many_dist is not None and many_dist > 0
-    print('some     ', 'true' if some else 'false')
+    many = many_dist if many_dist is not None else '-1'
+    some = 'true' if many_dist is not None and many_dist > 0 else 'false'
 elif len(G) < brute_force_limit: # constant time algorithm, factor 14!
     many_dist = redscare_many_brute(G, R, s, t)
-    print('many     ', many_dist if many_dist is not None else '-1')
-    some = many_dist is not None and many_dist > 0
-    print('some     ', 'true' if some else 'false')
+    many = many_dist
+    some = 'true' if many_dist is not None and many_dist > 0 else 'false'
 else:
-    print('many     ', f'G is cyclic, |R`|={len(R)} |V`|={len(G)}')
-    print('some     ', f'G is cyclic, |R`|={len(R)} |V`|={len(G)}')
+    many = '?!'
+    some = '?!'
+
+print('true' if alternate else 'false', end='\t')
+print(few, end='\t')
+print(many, end='\t')
+print(none, end='\t')
+print(some, end='\t')
 

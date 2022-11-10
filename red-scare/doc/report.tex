@@ -6,12 +6,20 @@
 \usepackage{color}
 \newcommand{\red}[1]{{\color{red} #1}}
 \usepackage{booktabs}
+
+\title{Red Scare! Report}
+\author{
+  Bjarke Brodin (bjal)\\
+  Bjørnar Haugstad Jåtten (bjja)\\
+  Helle Friis (hefr)\\
+  and Simon Boye Jørgensen (sboj)
+}
+
 \begin{document}
-\section{Red Scare! Report}
 
-by Alice Cooper.
+\maketitle
 
-\subsection{Results}
+\section{Results}
 
 The following table gives my results for all graphs of at least 500 vertices.
 
@@ -33,7 +41,51 @@ For those questions where there is a reason for my inability to find a good algo
 
 For the complete table of all results, see the tab-separated text file {\tt results.txt}.
 
-\subsection{Methods}
+\section{Methods}
+
+For all solutions we process the input to produce a graph $G$,
+which we assume to be simple.
+
+\subsection{None}
+We solve this problem efficiently for all graphs.
+Here we did not put any of the red vertex in the graph.
+Then when running the shortest path algorithm we were guaranteed
+to find the shortest path without any red vertexes in the path
+if there exists one.
+
+We use BFS for the shortest path algorithm which has a 
+running time of $O((|E| + |V|) \log |V|)$.
+
+\subsection{Alternate}
+To solve alternate, we first removed all reflective edges, 
+meaning the edges that go from black to black or red to red.
+Afterwards, we applied a shortest path algorithm.
+If there exists a path between t and s, it must be 
+alternating between black and red, as all the relfective edges are removed from the graph.
+
+The runnning time for the shortest path algorithm is the 
+same as in "None", as we use the same algorithm.
+Running time is dominated by shortest path and is thus simply
+$O((|E|+|V|) \log |V|)$.
+
+
+
+\subsection{Few}
+To solve \textit{few}, 
+we realize that we can manipulate edge weights
+to allow a reduction to shortest path.
+We set weights to 1 for all arcs that 
+are incident on a red vertex and all other weights to 0,
+then simply run an appropriate shortest path algorithm 
+and return the distance.
+Running time is dominated by shortest path and is thus simply
+$O((|E|+|V|) \log |V|)$.
+
+
+\subsection{Many}
+% much math
+\subsection{Some}
+%see many - much math
 
 For problem A, I solved each instance $G$ by $\cdots$\footnote{Describe what you did.
   Use words like ``building a inverse anti-tree without self-loops where each vertex in $G$ is presented by a Strogatz--Wasserman shtump.
@@ -50,7 +102,7 @@ Let $\ldots$
 
 I was also unable to solve $\cdots$ for $\cdots$, but I don’t know why.\footnote{Remove or expand as necessary.}
 
-\subsection{References}
+\section{References}
 \begin{description}
   \item[1.] \emph{APLgraphlib---A library for Basic Graph Algorithms in APL}, version 2.11, 2016, Iverson Project, {\tt github.com/iverson/APLgraphlib}.\sidenote{If you use references to code, books, or papers, be professional about it. Use whatever style you want, but be consistent.}
 
