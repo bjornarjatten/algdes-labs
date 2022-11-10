@@ -164,8 +164,6 @@ for i in range(m):
 
 
 import sys
-print()
-print(sys.argv[1])
 
 s,t = V[s], V[t]
 # Is s and t in the same component?
@@ -214,6 +212,11 @@ else:
     many = '?!'
     some = '?!'
 
+if len(sys.argv) > 2 and sys.argv[2] == 'large' and len(G) < 500:
+    exit()
+
+print()
+print(sys.argv[1], end='\t')
 print('true' if alternate else 'false', end='\t')
 print(few, end='\t')
 print(many, end='\t')
