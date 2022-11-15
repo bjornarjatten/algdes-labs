@@ -66,8 +66,6 @@ alternating between black and red, as all the relfective edges are removed from 
 Running time is dominated by shortest path and is thus simply
 $O((|E|+|V|) \log |V|)$.
 
-
-
 \subsection{Few}
 To solve \textit{few}, 
 we realize that we can manipulate edge weights
@@ -79,12 +77,11 @@ and return the distance.
 Running time is dominated by shortest path and is thus simply
 $O((|E|+|V|) \log |V|)$.
 
-
 \subsection{Many}
 We solve many for directed acyclic graphs,
 by using much the same approach as in few,
 only, instead of setting 1 weighted red arcs,
-we use -1 weighed red arcs.
+we use -1 weighted red arcs.
 Running shortest path then yields the negation
 of our desired result.
 We take care to use a shortest path algorithm
@@ -96,35 +93,20 @@ because the general case includes $R = G$.
 Solving many in this case implies solving 
 the longest path problem exactly, 
 and since this is known to be NP-hard
-we can safely give up.
+we can safely give up. %TODO refer to KT
 
 \subsection{Some}
 First we just on the background of many decided wether that Some was possible or not. 
 Now we solve it in a more independent way by making it to a flow problem. 
 ... 
+%TODO refer to KT for maxflow
 
-%see many - much math
-
-For problem A, I solved each instance $G$ by $\cdots$\footnote{Describe what you did.
-  Use words like ``building a inverse anti-tree without self-loops where each vertex in $G$ is presented by a Strogatz--Wasserman shtump.
-  I then performed a standard longest hash sorting using the algorithm of Bronf (Algorithm 5 in [1]).''
-  Be neat, brief, and precise.}
-The running time of this algorithm is $\cdot$, and my implementation spends $\cdots$ seconds on the instance $\cdots$ with  $n=\cdots$.
-
-I solved problem $\cdots$ for all $\cdots$\footnote{For instance, “planar, bipartite”} graphs using $\cdots$.
-
-I was unable to solve problem $\cdots$ except for the $\cdots$ instances.
-This is because, in generality, this problem is $\cdots$. 
-To see this, consider the following reduction from $\cdots$.
-Let $\ldots$ 
-
-I was also unable to solve $\cdots$ for $\cdots$, but I don’t know why.\footnote{Remove or expand as necessary.}
 
 \section{References}
 \begin{description}
-  \item[1.] \emph{APLgraphlib---A library for Basic Graph Algorithms in APL}, version 2.11, 2016, Iverson Project, {\tt github.com/iverson/APLgraphlib}.\sidenote{If you use references to code, books, or papers, be professional about it. Use whatever style you want, but be consistent.}
-
-  \item[2.] A. Lovelace, \emph{Algorithms and Data Structures in Pascal}, Addison--Wesley 1881. 
+  \item[1.] Something
+  \item[2.] Something else
+  \item[3.] Something else else 
 \end{description}
 
 \end{document}

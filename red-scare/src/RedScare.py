@@ -1,5 +1,7 @@
+
+import sys
 from math import inf
-from collections import deque
+from collections import deque, defaultdict
 
 class UnionFind:
   def __init__(self, V):
@@ -124,14 +126,14 @@ def lvlbfs(g, s, t):
       q.appendleft((w, vlvl + 1))
   return lvl
 
-def flow(G, source, sink, flow=0):
+def maxflow(G, source, sink, flow=0):
   levels = lvlbfs(G, source, sink)
   if sink not in levels: return flow
   increase = inf
   while increase > 0:
     increase = fdfs(G,source,sink,levels,inf,set())
     flow += increase
-  return flow(G, source, sink, flow=flow) 
+  return maxflow(G, source, sink, flow=flow) 
 
 
 
@@ -175,6 +177,35 @@ def redscare_many_brute(G, R, s, t):
     else:
         return None
 
+def redscare_some(G, R, s, t, N):
+  G = {
+    v: {u: 1 for u in es.keys() if v in G[u]}
+    for v,es in G.items()
+  }
+
+  G_Split = defaultdict(dict)
+
+  for i in range(N): 
+    G_Split[i][N+i] = 1
+    G_Split[N+i][i] = 0
+
+  for v,es in G.items():
+    for u in es.keys():
+      G_Split[N+v][u] = 1
+
+  G = G_Split
+
+  source = -1
+  G[source][s] = 1
+  G[s][source] = 0
+  G[source][t] = 1
+  G[t][source] = 1
+
+  for r in R:
+    if maxflow(G, source, r) >= 2:
+      return True
+  return None
+
 
 
 n,m,r = map(int, input().split())
@@ -196,10 +227,17 @@ for i in range(m):
   G[V[u]][V[v]] = 1
   if e != '->': G[V[v]][V[u]] = 1
 
+if len(sys.argv) > 2 and sys.argv[2] == 'large' and len(G) < 500:
+    exit()
+if len(sys.argv) > 2 and sys.argv[2] == 'small' and len(G) > 200:
+    exit()
+
 
 s,t = V[s], V[t]
 # Is s and t in the same component?
 if UF.find(s) != UF.find(t): 
+  print()
+  print(sys.argv[1], end='\t')
   print('false', end='\t')
   print('-1', end='\t')
   print('-1', end='\t')
@@ -228,25 +266,25 @@ few = few_dist if few_dist else '-1'
 none_dist = redscare_none(G, R, s, t)
 none = none_dist if none_dist else '-1'
 
+some = 'true' if redscare_some(G, R, s, t, n) else None
+
 if len(R) == 0:
     many_dist = redscare_none(G, R, s, t)
-    some = 'false'
     many = 0 if many_dist is not None else '-1'
+    if some is None: some = 'false'
 elif not is_cyclic(G, s):
     many_dist = redscare_many(G, R, s, t)
     many = many_dist if many_dist is not None else '-1'
-    some = 'true' if many_dist is not None and many_dist > 0 else 'false'
+    if some is None and many_dist is not None: some = 'false' if many_dist == 0 else 'true'
 elif len(G) < brute_force_limit: # constant time algorithm, factor 14!
     many_dist = redscare_many_brute(G, R, s, t)
     many = many_dist
-    some = 'true' if many_dist is not None and many_dist > 0 else 'false'
+    if some is None and many_dist is not None: some = 'false' if many_dist == 0 else 'true'
 else:
     many = '?!'
-    some = '?!'
+some = '?!' if some is None else some
 
-import sys
-if len(sys.argv) > 2 and sys.argv[2] == 'large' and len(G) < 500:
-    exit()
+
 
 print()
 print(sys.argv[1], end='\t')
