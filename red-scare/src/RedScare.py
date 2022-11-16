@@ -288,6 +288,7 @@ some = '?!' if some is None else some
 
 print()
 print(sys.argv[1], end='\t')
+print(n, end='\t')
 print('true' if alternate else 'false', end='\t')
 print(few, end='\t')
 print(many, end='\t')

@@ -1,1 +1,0 @@
-false	alternate	gnm-10-15-0.txt

@@ -1,1 +1,0 @@
--	many	wall-p-10000.txt

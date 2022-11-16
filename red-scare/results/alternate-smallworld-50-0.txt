@@ -1,1 +1,0 @@
-false	alternate	smallworld-50-0.txt

@@ -1,1 +1,0 @@
-true	alternate	ski-level10-1.txt

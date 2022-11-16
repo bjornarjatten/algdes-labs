@@ -1,1 +1,0 @@
-true	alternate	smallworld-20-1.txt

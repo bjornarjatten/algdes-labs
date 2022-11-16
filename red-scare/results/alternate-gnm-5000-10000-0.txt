@@ -1,1 +1,0 @@
-false	alternate	gnm-5000-10000-0.txt

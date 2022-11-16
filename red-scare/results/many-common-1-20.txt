@@ -1,1 +1,0 @@
--1	many	common-1-20.txt

@@ -1,1 +1,0 @@
-1	none	wall-z-10000.txt

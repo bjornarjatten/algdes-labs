@@ -1,1 +1,0 @@
-10	few	grid-50-2.txt

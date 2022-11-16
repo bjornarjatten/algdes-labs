@@ -1,1 +1,0 @@
-true	alternate	G-ex2.txt
