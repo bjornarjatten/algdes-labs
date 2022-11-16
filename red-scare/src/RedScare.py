@@ -238,6 +238,7 @@ s,t = V[s], V[t]
 if UF.find(s) != UF.find(t): 
   print()
   print(sys.argv[1], end='\t')
+  print(n, end='\t')
   print('false', end='\t')
   print('-1', end='\t')
   print('-1', end='\t')
@@ -283,7 +284,6 @@ elif len(G) < brute_force_limit: # constant time algorithm, factor 14!
 else:
     many = '?!'
 some = '?!' if some is None else some
-
 
 
 print()
