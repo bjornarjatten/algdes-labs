@@ -1,7 +1,0 @@
-
-- [ x ] handle string-indexed vertices
-- [ x ] fix directed logic: 'u -> v' is a directed edge, 'u -- v' is undirected
-- [ x ] setup output format for tests (better format, time)
-- [ x ] clean up code to make suites faster and code more readable
-- [ x ] identify hardness reduction for some: some NP hard problem NEEDS to reduce to some
-- [ x ] write report
