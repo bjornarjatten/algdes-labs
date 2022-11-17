@@ -210,16 +210,18 @@ since many $\ge$ 1 is equivalent to the result of some. \\
 
 However we can utilize the maximum flow algorithm to solve
 some in polynomial time even when we may not be able to solve many.
-We construct a solution as follows:
+We construct an $O(|V||E||R|)$ solution as follows:
 \begin{itemize}
   \item Ensure that all edges in the graph are bidirectional by filtering any that aren't, set all weights to 1.
   \item Ensure that each vertex $v$ can only be used once, by splitting it into vertices $v$ and $|V|+v$ such that all incoming edges go to
   $v$ and all outgoing edges go from $|V|+v$. Then add a directional edge from $v$ to $|V|+v$ with weight 1.
   \item Add a new source vertex $s'$ and two new edges from $s'$ to $s$ and from $s'$ to $t$ both with weight 1.
-  \item For each red vertex $r$ compute maxflow$(s', r)$ -- if any flow is 2 then some must be 'true' 
-  (because every used original edge is bidirectional),
-  if no such flow is found we can't however 
-  conclude that 'false' is the correct result, since we don't have sufficient information to make this claim.
+  \item For each red vertex $r$ compute maxflow$(s', r)$ -- if any flow is 2
+    then some must be 'true' (because every used original edge is
+    bidirectional), in fact any maxflow is at most 2 which reduces the worst
+    case running time considerably.
+    If no such flow is found we can't conclude that 'false' is the 
+    correct result, since we don't have sufficient information to make this claim.
 \end{itemize}
 
 In the general case the best solution we know of is 
